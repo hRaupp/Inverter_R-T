@@ -104,7 +104,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		if(cont == TAM_SIN - 1)
 			cont = 0;
 
-		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, sin_wave_mod[cont]);
+		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, sin_wave[cont]);
 		//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_, sin_wave_mod[cont]);
 
 	}
@@ -148,9 +148,9 @@ int main(void)
   MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 
-  	HAL_TIM_Base_Start_IT(&htim10);
-  	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-	HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_Base_Start_IT(&htim10);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
 
 /*
 	for (i = 0; i < TAM_SIN; i++) {
@@ -159,14 +159,14 @@ int main(void)
 	}
 
 */
-
+/*
 	for(int j = 0; j < TAM_SIN; j++){
 
 		sin_wave_mod[j] = sin_wave[j] / 2;
 
 	}
 
-
+*/
 
   /* USER CODE END 2 */
 
