@@ -39,6 +39,8 @@
 
 #define DOISPI 6.2831
 #define TAM_SIN 250 // 15Khz
+#define MOV_ENCODER 25
+
 
 /* USER CODE END PD */
 
@@ -74,6 +76,7 @@ uint32_t sin_wave_mod[TAM_SIN];
 uint16_t i;
 uint16_t cont = 0;
 uint16_t contador_encoder = 0;
+uint8_t variacao_encoder = 0;
 
 /* USER CODE END PV */
 
@@ -92,6 +95,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 		contador_encoder = (__HAL_TIM_GET_COUNTER(&htim4)); // ENCODER DE 5 A 50 s
 
+		variacao_encoder = contador_encoder + MOV_ENCODER;
+
 		cont++;
 
 		if (cont == TAM_SIN - 1){
@@ -99,9 +104,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, sin_wave[cont]);
 
-		__HAL_TIM_SET_PRESCALER(&htim10, contador_encoder);
+		__HAL_TIM_SET_PRESCALER(&htim10, variacao_encoder);
 
 		//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_, sin_wave_mod[cont]);
+
 
 	}
 
