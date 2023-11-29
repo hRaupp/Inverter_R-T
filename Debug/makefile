@@ -60,8 +60,8 @@ all: main-build
 main-build: Inversor_ReT.elf secondary-outputs
 
 # Tool invocations
-Inversor_ReT.elf Inversor_ReT.map: $(OBJS) $(USER_OBJS) C:\Escola\Micros2\Inversor_ReT\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Inversor_ReT.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Escola\Micros2\Inversor_ReT\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Inversor_ReT.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Inversor_ReT.elf Inversor_ReT.map: $(OBJS) $(USER_OBJS) D:\Liberato\Codigos_micros\Inverter\Inverter_R-T\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Inversor_ReT.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\Liberato\Codigos_micros\Inverter\Inverter_R-T\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Inversor_ReT.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
