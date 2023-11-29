@@ -55,7 +55,7 @@
 ///////////////////// Maquina de estados//////////////////////
 enum {
 
-	desligado = 0, ligado, bypass
+	desligado = 0, ligado, bypass, emergencia
 
 };
 
@@ -97,6 +97,7 @@ void SystemClock_Config(void);
 void Desligado(void){
 
 	HAL_TIM_Base_Stop_IT(&htim10);
+
 	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
 	HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
 
@@ -110,6 +111,7 @@ void Desligado(void){
 void Ligado(void){
 
 	HAL_TIM_Base_Start_IT(&htim10);
+
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 	HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
 
@@ -137,6 +139,8 @@ void Rele_Ligado(void){
 
 
 }
+
+
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
@@ -172,7 +176,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 			bsubida = 1;
 			bdescida = 0;
-			comando++;
 
 		}
 
@@ -233,6 +236,9 @@ int main(void) {
 	MX_TIM11_Init();
 	/* USER CODE BEGIN 2 */
 
+	HAL_TIM_Base_Start_IT(&htim11);// Botao
+
+
 //////////////////DIVIDE SENOIDE////////////////////////
 	/*
 	 for (int j = 0; j < TAM_SIN; j++) {
@@ -278,7 +284,16 @@ int main(void) {
 			//---------------Condiçao de troca de estado--------------/////
 
 			if(time >= 60){ //Se passou 3 segundos
+
 			estado_atual = bypass;
+
+			}
+
+			if(bsubida){
+
+			time = 0;
+			estado_atual = desligado;
+
 			}
 
 			break;
@@ -287,21 +302,28 @@ int main(void) {
 
 			Rele_Ligado();
 
+			if(bsubida){
+
+			time = 0;
+			estado_atual = desligado;
+
+			}
 
 			break;
 
+
 		default:
 
-			HAL_TIM_Base_Stop_IT(&htim10);
-			HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
-			HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
+			Desligado();
 
-			/////////Start Encoder//////////////
-			HAL_TIM_Encoder_Stop(&htim4, TIM_CHANNEL_1);
-			HAL_TIM_Encoder_Stop(&htim4, TIM_CHANNEL_2);
+			//---------------Condiçao de troca de estado--------------/////
 
-			//Deixa resistor ligado
-			//Desliga led
+			if(bsubida){
+
+			time = 0;
+			estado_atual = ligado;
+
+			}
 
 			break;
 
