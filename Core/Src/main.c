@@ -68,6 +68,7 @@ uint8_t estado_atual = desligado;
 uint32_t sin_wave_mod[TAM_SIN];
 uint16_t i;
 uint16_t cont = 0;
+uint8_t time = 0;
 
 ///////////////////ENCODER///////////////
 uint16_t contador_encoder = 0;
@@ -108,6 +109,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_, sin_wave_mod[cont]);
 
 	}
+
+	if (htim->Instance == TIM10) {
+
+		time++;
+
+	}
+
 
 }
 
@@ -180,6 +188,7 @@ int main(void) {
 			//Desliga led
 
 			//if(botao){
+			//time = 0;
 			//estado_atual = ligado
 			//}
 
@@ -199,7 +208,7 @@ int main(void) {
 			//liga led de circuito ligado
 			//led de bypass desligado
 
-			//if(tempo >= 3){
+			//if(time >= 3){
 			//estado_atual = bypass
 			//}
 
