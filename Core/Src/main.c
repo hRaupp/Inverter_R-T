@@ -28,7 +28,6 @@
 #include "math.h"
 #include "vetor_senoide.h"
 
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,8 +52,6 @@
 
 /* USER CODE BEGIN PV */
 
-
-
 ///////////////////// Maquina de estados//////////////////////
 enum {
 
@@ -75,6 +72,17 @@ uint16_t contador_encoder = 0;
 uint8_t variacao_encoder = 0;
 /////////////////////////////////////////
 
+// DETEC BORDA
+enum {
+	AGORA = 0, ANTES
+};
+
+uint8_t comando = 0;
+uint8_t bt1[2] = { 0, 0 };
+
+uint8_t bsubida;
+uint8_t bdescida;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -85,6 +93,50 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+void Desligado(void){
+
+	HAL_TIM_Base_Stop_IT(&htim10);
+	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
+	HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
+
+	HAL_TIM_Encoder_Stop(&htim4, TIM_CHANNEL_1);
+	HAL_TIM_Encoder_Stop(&htim4, TIM_CHANNEL_2);
+
+	HAL_GPIO_WritePin(LED_ON_GPIO_Port, LED_ON_Pin, 0);//Pulsos sendo gerados
+
+}
+
+void Ligado(void){
+
+	HAL_TIM_Base_Start_IT(&htim10);
+	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+	HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+
+	/////////Start Encoder//////////////
+	HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_1);
+	HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_2);
+
+	HAL_GPIO_WritePin(LED_ON_GPIO_Port, LED_ON_Pin, 1);//Pulsos sendo gerados / Led Ligado
+
+}
+
+void Rele_Desligado(void){
+
+	HAL_GPIO_WritePin(LED_BYPASS_GPIO_Port, LED_BYPASS_Pin, 0);//resistor ligado // Rele desligado
+
+	HAL_GPIO_WritePin(RELE_BYPASS_GPIO_Port, RELE_BYPASS_Pin, 0);// led bypass desligado
+
+}
+
+void Rele_Ligado(void){
+
+	HAL_GPIO_WritePin(LED_BYPASS_GPIO_Port, LED_BYPASS_Pin, 1);//resistor desligad // Rele Ligado
+
+	HAL_GPIO_WritePin(RELE_BYPASS_GPIO_Port, RELE_BYPASS_Pin, 1);//resistor led bypass ligado
+
+
+}
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
@@ -110,12 +162,37 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 	}
 
-	if (htim->Instance == TIM10) {
+	if (htim->Instance == TIM11) {
 
+		//////////////////DEBOUNCE E DETECCAO DE BORDA///////////////////
+
+		bt1[AGORA] = HAL_GPIO_ReadPin(BOT1_GPIO_Port, BOT1_Pin);
+
+		if (bt1[AGORA] == 1 && bt1[ANTES] == 0) {
+
+			bsubida = 1;
+			bdescida = 0;
+			comando++;
+
+		}
+
+		if (bt1[AGORA] == 0 && bt1[ANTES] == 1) {
+
+			bdescida = 1;
+			bsubida = 0;
+
+		}
+
+		bt1[ANTES] = bt1[AGORA];  /////// DETC BOT 1
+
+
+		//-------------------BASE DE TEMPO--------------//
 		time++;
 
-	}
+		if (time > 70)
+			time = 0;
 
+	}
 
 }
 
@@ -127,6 +204,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
  */
 int main(void) {
 	/* USER CODE BEGIN 1 */
+
 
 	/* USER CODE END 1 */
 
@@ -152,6 +230,7 @@ int main(void) {
 	MX_TIM1_Init();
 	MX_TIM10_Init();
 	MX_TIM4_Init();
+	MX_TIM11_Init();
 	/* USER CODE BEGIN 2 */
 
 //////////////////DIVIDE SENOIDE////////////////////////
@@ -169,55 +248,45 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 
-	//============================= Maquina de estados =============================//
-
+		//============================= Maquina de estados =============================//
 
 		switch (estado_atual) {
 
 		case desligado:
 
-			HAL_TIM_Base_Stop_IT(&htim10);
-			HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
-			HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
 
-			/////////Start Encoder//////////////
-			HAL_TIM_Encoder_Stop(&htim4, TIM_CHANNEL_1);
-			HAL_TIM_Encoder_Stop(&htim4, TIM_CHANNEL_2);
+			Desligado();
 
-			//Deixa resistor ligado
-			//Desliga led
+			Rele_Desligado();
 
-			//if(botao){
-			//time = 0;
-			//estado_atual = ligado
-			//}
+			//---------------Condiçao de troca de estado--------------/////
+			if(bsubida){
+
+			time = 0;
+			estado_atual = ligado;
+
+			}
 
 			break;
 
 		case ligado:
 
-			HAL_TIM_Base_Start_IT(&htim10);
-			HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-			HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+			Ligado();
 
-			/////////Start Encoder//////////////
-			HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_1);
-			HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_2);
+			Rele_Desligado();
 
-			//resistor ligado
-			//liga led de circuito ligado
-			//led de bypass desligado
+			//---------------Condiçao de troca de estado--------------/////
 
-			//if(time >= 3){
-			//estado_atual = bypass
-			//}
+			if(time >= 60){ //Se passou 3 segundos
+			estado_atual = bypass;
+			}
 
 			break;
 
 		case bypass:
 
-			//aciona o bypass
-			//liga led de bypass
+			Rele_Ligado();
+
 
 			break;
 
