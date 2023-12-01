@@ -166,13 +166,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			cont = 0;
 		}
 
-		//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, sin_wave_mod[cont]);
-		//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, sin_wave_mod[cont]);
 		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, sin_wave[cont]);
 
 		__HAL_TIM_SET_PRESCALER(&htim10, variacao_encoder);
-
-		//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_, sin_wave_mod[cont]);
 
 	}
 
@@ -202,7 +198,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		if(comando >= 2){
 			comando = 0;
 		}
-
 
 		//-------------------BASE DE TEMPO--------------//
 		time++;
@@ -254,16 +249,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 	HAL_TIM_Base_Start_IT(&htim11);// Botao
+	SSD1306_Init(); // inicia o display
 
-
-//////////////////DIVIDE SENOIDE////////////////////////
-	/*
-	 for (int j = 0; j < TAM_SIN; j++) {
-
-	 sin_wave_mod[j] = sin_wave[j] / 2;
-
-	 }
-	 */
 
   /* USER CODE END 2 */
 
