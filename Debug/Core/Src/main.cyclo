@@ -4,6 +4,6 @@ main.c:129:6:Rele_Desligado	1
 main.c:137:6:Rele_Ligado	1
 main.c:146:6:Header	1
 main.c:155:6:HAL_TIM_PeriodElapsedCallback	10
-main.c:223:5:main	10
-main.c:384:6:SystemClock_Config	3
-main.c:435:6:Error_Handler	1
+main.c:218:5:main	10
+main.c:371:6:SystemClock_Config	3
+main.c:422:6:Error_Handler	1

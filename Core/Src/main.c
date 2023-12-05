@@ -299,7 +299,7 @@ int main(void)
 
 			//---------------Condiçao de troca de estado--------------/////
 
-			if(time >= 60){ //Se passou 3 segundos
+			if(time >= 21){ //Se passou 1,5 segundos
 
 			estado_atual = bypass;
 
